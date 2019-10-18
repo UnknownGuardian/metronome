@@ -4,6 +4,9 @@ type DelayedCall = {
 }
 
 class Metronome {
+  // don't do work when there is nothing to do
+  _sleepResolve:Function;
+
   _callbacks:DelayedCall[];
   _currentTick:number;
   constructor(){
@@ -23,9 +26,31 @@ class Metronome {
 
   async tick():Promise<void> {
     this._currentTick++;
-    for(const call of this._callbacks) {
-      if(call.tickToExecute == this._currentTick)
+    for(let i = 0; i < this._callbacks.length; i++) {
+      const call = this._callbacks[i];
+      if(call.tickToExecute == this._currentTick){
         await call.callback();
+        this._callbacks.slice(i, 1);
+        i--;
+      }
+    }
+
+    await this.sleep();
+  }
+
+  // halt until resolved
+  private async sleep() {
+    if(this._callbacks.length == 0) {
+      await new Promise((resolve) => {
+        this._sleepResolve = resolve;
+      });
+    }
+  }
+
+  private async awake() {
+    if(this._sleepResolve) {
+      this._sleepResolve();
+      this._sleepResolve = null;
     }
   }
 
@@ -34,6 +59,7 @@ class Metronome {
       callback,
       tickToExecute: this._currentTick + ticks
     })
+    this.awake();
   }
 }
 
