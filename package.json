@@ -1,0 +1,19 @@
+{
+  "name": "metronome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "@types/node": "^11.13.7",
+    "typescript": "^3.1.1"
+  },
+  "scripts": {
+    "start": "tsc -w --preserveWatchOutput",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
